@@ -41,6 +41,8 @@ export default [
     languageOptions: {
       globals: {
         ...autoImportGlobals,
+        // Element Plus 自动导入的组件和API
+        ElMessage: 'readonly',
       },
     },
   },

@@ -7,7 +7,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       // 这里暂时指向一个简单的 HelloWorld 页面，或者默认的 HomeView
-      component: () => import('@/views/login/index.vue'),
+      component: () => import('@/views/layout/index.vue'),
     },
     {
       path: '/login',

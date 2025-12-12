@@ -4,6 +4,10 @@
 
 import { useUserStore } from '@/stores/user'
 
+defineOptions({
+  name: 'LoginPage',
+})
+
 const router = useRouter()
 const userStore = useUserStore()
 
