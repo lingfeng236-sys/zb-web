@@ -16,14 +16,16 @@ const router = createRouter({
         {
           path: 'dashboard', // 注意：这里不要写 /dashboard，写 dashboard 即可
           name: 'Dashboard',
-          component: () => import('@/views/HomeView.vue'), // 你的首页组件
-          meta: { title: '首页' }
+          component: () => import('@/views/dashboard/index.vue'), // 你的首页组件
+          meta: { title: '数据看板' }
         },
         // 这里以后可以加更多页面，比如 /user
-        // {
-        //   path: 'user',
-        //   component: () => import('@/views/user/index.vue')
-        // }
+        {
+          path: 'user',
+          name: 'User',
+          component: () => import('@/views/dashboard/index.vue'),
+          meta: { title: '用户管理' }
+        }
       ]
     }
   ]
