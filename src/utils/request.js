@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
+import { useUserStore } from '@/stores/user'
 
 // 1. 创建 axios 实例
 const service = axios.create({
@@ -11,11 +12,11 @@ const service = axios.create({
 // 2. 请求拦截器：发送请求前做些什么
 service.interceptors.request.use(
   (config) => {
-    // 从 localStorage 获取 token
-    const token = localStorage.getItem('token')
-    if (token) {
+    // 从 Pinia Store 获取 token
+    const userStore = useUserStore()
+    if (userStore.token) {
       // 如果有 token，把它放到请求头里带给后端
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `Bearer ${userStore.token}`
     }
     return config
   },
@@ -35,8 +36,8 @@ service.interceptors.response.use(
 
       // 401 代表 Token 过期或未登录
       if (res.code === 401) {
-        localStorage.removeItem('token')
-        location.reload()
+        const userStore = useUserStore()
+        userStore.logout()
       }
       return Promise.reject(new Error(res.message || 'Error'))
     }
