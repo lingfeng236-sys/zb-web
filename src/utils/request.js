@@ -6,7 +6,7 @@ import { useUserStore } from '@/stores/user'
 const service = axios.create({
   // 这里的 /api 是为了后续配置代理，或者直接填后端地址
   baseURL: 'http://localhost:8080/',
-  timeout: 5000,
+  timeout: 50000,
 })
 
 // 2. 请求拦截器：发送请求前做些什么
@@ -41,7 +41,7 @@ service.interceptors.response.use(
       }
       return Promise.reject(new Error(res.message || 'Error'))
     }
-    return res
+    return res.data
   },
   (error) => {
     // 处理网络错误
