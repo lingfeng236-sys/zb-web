@@ -1,37 +1,37 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useDictStore } from '@/stores/dict'
+import { Male, Female } from '@element-plus/icons-vue' // 引入图标（可选，如果需要特定图标）
 
 defineOptions({
   name: 'DictSelect',
 })
 
-// 接收父组件传来的参数
 const props = defineProps({
-  // 绑定值 (v-model)
   modelValue: {
     type: [String, Number, Array],
     default: '',
   },
-  // 字典编码 (必填，例如 'packaging_version')
   dictCode: {
     type: String,
     required: true,
   },
-  // 占位符
   placeholder: {
     type: String,
     default: '请选择',
   },
-  // 是否多选
   multiple: {
     type: Boolean,
     default: false,
   },
-  // 是否可清空
   clearable: {
     type: Boolean,
     default: true,
+  },
+  // 新增：强制使用 Select 模式（即使只有2个选项也显示下拉框）
+  forceSelect: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -40,30 +40,36 @@ const dictStore = useDictStore()
 const options = ref([])
 const loading = ref(false)
 
-// 计算属性实现 v-model 的双向绑定
+// 双向绑定处理
 const innerValue = computed({
   get: () => props.modelValue,
   set: (val) => {
     emit('update:modelValue', val)
-    emit('change', val) // 触发 change 事件，方便父组件监听
+    emit('change', val)
   },
 })
 
-// 初始化获取数据
+// 计算是否显示为 Radio 模式
+// 条件：非多选 + 选项数量小于等于2 + 未强制开启Select模式 + 数据加载完成
+const showAsRadio = computed(() => {
+  if (props.multiple) return false
+  if (props.forceSelect) return false
+  if (loading.value) return false // 加载中还是显示 Select 或 Loading 比较好
+  return options.value.length > 0 && options.value.length <= 2
+})
+
+// 初始化数据
 const initData = async () => {
   if (!props.dictCode) return
   loading.value = true
-  // 调用 Store 的方法，如果有缓存直接拿，没有缓存去请求
   options.value = await dictStore.getDict(props.dictCode)
   loading.value = false
 }
 
-// 挂载时加载数据
 onMounted(() => {
   initData()
 })
 
-// 监听 dictCode 变化（防止父组件动态修改了 code）
 watch(
   () => props.dictCode,
   () => {
@@ -73,14 +79,62 @@ watch(
 </script>
 
 <template>
-  <el-select
-    v-model="innerValue"
-    :placeholder="placeholder"
-    :clearable="clearable"
-    :multiple="multiple"
-    :loading="loading"
-    style="width: 100%"
-  >
-    <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-  </el-select>
+  <div class="dict-select-container">
+    <el-radio-group v-if="showAsRadio" v-model="innerValue" class="dict-radio-group">
+      <el-radio v-for="item in options" :key="item.value" :value="item.value" border>
+        <div class="radio-content">
+          <el-icon v-if="item.label.includes('男')"><Male /></el-icon>
+          <el-icon v-if="item.label.includes('女')"><Female /></el-icon>
+          <span>{{ item.label }}</span>
+        </div>
+      </el-radio>
+    </el-radio-group>
+
+    <el-select
+      v-else
+      v-model="innerValue"
+      :placeholder="placeholder"
+      :clearable="clearable"
+      :multiple="multiple"
+      :loading="loading"
+      style="width: 100%"
+    >
+      <el-option
+        v-for="item in options"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value"
+      />
+    </el-select>
+  </div>
 </template>
+
+<style scoped>
+.dict-select-container {
+  width: 100%;
+}
+
+.dict-radio-group {
+  display: flex;
+  width: 100%;
+  justify-content: space-between; /* 两端对齐 */
+}
+
+/* 深度选择器：强制让 el-radio 占满一半宽度，看起来整齐 */
+:deep(.el-radio) {
+  flex: 1; /* 平分宽度 */
+  margin-right: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+:deep(.el-radio:last-child) {
+  margin-right: 0;
+}
+
+.radio-content {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+</style>
