@@ -6,7 +6,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('@/views/login/index.vue')
+      component: () => import('@/views/login/index.vue'),
     },
     {
       path: '/',
@@ -17,18 +17,18 @@ const router = createRouter({
           path: 'dashboard', // 注意：这里不要写 /dashboard，写 dashboard 即可
           name: 'Dashboard',
           component: () => import('@/views/dashboard/index.vue'), // 你的首页组件
-          meta: { title: '数据看板' }
+          meta: { title: '数据看板' },
         },
         // 这里以后可以加更多页面，比如 /user
         {
           path: 'user',
           name: 'User',
-          component: () => import('@/views/dashboard/index.vue'),
-          meta: { title: '用户管理' }
-        }
-      ]
-    }
-  ]
+          component: () => import('@/views/user/index.vue'),
+          meta: { title: '用户管理' },
+        },
+      ],
+    },
+  ],
 })
 
 export default router
