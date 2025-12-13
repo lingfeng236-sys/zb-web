@@ -9,3 +9,9 @@ export const DictShowType = {
 
 // 可选：冻结对象，防止后续代码不小心修改了它（类似 Java 的 final）
 Object.freeze(DictShowType)
+
+export const DictTypeEnum = {
+  ROLE: 'role',
+  GENDER: 'gender',
+}
+Object.freeze(DictTypeEnum)

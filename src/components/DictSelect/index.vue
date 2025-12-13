@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useDictStore } from '@/stores/dict'
-import { DictShowType } from '@/enums/DictTypeEnum'
+import { DictShowType } from '@/enums/DictEnum'
 
 defineOptions({
   name: 'DictSelect',
@@ -13,7 +13,7 @@ const props = defineProps({
     type: [String, Number, Array, Boolean],
     default: '',
   },
-  dictCode: {
+  dictType: {
     type: String,
     required: true,
   },
@@ -57,10 +57,10 @@ const innerValue = computed({
 
 // 初始化数据
 const initData = async () => {
-  if (!props.dictCode) return
+  if (!props.dictType) return
   loading.value = true
   // Store 获取的数据结构应该是 [{ code: 1, desc: '男' }, ...]
-  options.value = await dictStore.getDict(props.dictCode)
+  options.value = await dictStore.getDict(props.dictType)
   loading.value = false
 }
 
@@ -69,7 +69,7 @@ onMounted(() => {
 })
 
 watch(
-  () => props.dictCode,
+  () => props.dictType,
   () => initData(),
 )
 </script>
