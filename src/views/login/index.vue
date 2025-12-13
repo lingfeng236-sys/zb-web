@@ -3,7 +3,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
-import { Male, Female } from '@element-plus/icons-vue' // 引入性别图标
+import DictSelect from '@/components/DictSelect/index.vue'
 
 defineOptions({
   name: 'LoginIndex',
@@ -35,6 +35,7 @@ const registerForm = reactive({
   password: '',
   confirmPassword: '',
   gender: '1', // 默认性别：1男 2女
+  role: '1', // 默认角色：1管理员 2普通用户
 })
 
 // 自定义校验：检查两次密码是否一致
@@ -182,18 +183,16 @@ const handleRegister = () => {
         </el-form-item>
 
         <el-form-item prop="gender">
-          <el-radio-group v-model="registerForm.gender" class="gender-group">
-            <el-radio value="1" border>
-              <div class="gender-item">
-                <el-icon><Male /></el-icon> 男
-              </div>
-            </el-radio>
-            <el-radio value="2" border>
-              <div class="gender-item">
-                <el-icon><Female /></el-icon> 女
-              </div>
-            </el-radio>
-          </el-radio-group>
+          <DictSelect v-model="registerForm.gender" dict-code="gender" placeholder="请选择性别" />
+        </el-form-item>
+
+        <el-form-item prop="role">
+          角色
+          <DictSelect
+            v-model="registerForm.role"
+            dict-code="packaging_version"
+            placeholder="请选择角色"
+          />
         </el-form-item>
 
         <el-form-item>
@@ -241,22 +240,5 @@ const handleRegister = () => {
 .form-footer {
   text-align: center;
   margin-top: -10px;
-}
-
-.gender-group {
-  width: 100%;
-  justify-content: space-between;
-}
-
-/* 强制让两个 radio 平分宽度 */
-:deep(.el-radio.is-bordered) {
-  width: 48%;
-  margin-right: 0;
-}
-
-.gender-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
 }
 </style>
