@@ -5,7 +5,7 @@ import { useUserStore } from '@/stores/user'
 // 1. 创建 axios 实例
 const service = axios.create({
   // 这里的 /api 是为了后续配置代理，或者直接填后端地址
-  baseURL: '/api',
+  baseURL: 'http://localhost:8080/',
   timeout: 5000,
 })
 
