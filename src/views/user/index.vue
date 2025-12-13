@@ -2,7 +2,7 @@
 // import { defineOptions, reactive } from 'vue'
 // 引入我们刚才封装的组件 (由于配置了自动引入组件，其实不需要手动 import，但为了明确演示我写在这里)
 // import DictSelect from '@/components/DictSelect/index.vue'
-import { DictShowType } from '@/enums/DictEnum'
+import { DictShowType, DictTypeEnum } from '@/enums/DictEnum'
 
 defineOptions({
   name: 'DashboardIndex',
@@ -27,7 +27,7 @@ const handleVersionChange = (val) => {
         <el-form-item label="包装版本">
           <DictSelect
             v-model="queryParams.packVersion"
-            dictType="packaging_version"
+            :dictType="DictTypeEnum.PACKAGING_VERSION"
             placeholder="All"
             @change="handleVersionChange"
             style="width: 200px"
@@ -37,7 +37,7 @@ const handleVersionChange = (val) => {
         <el-form-item label="用户性别">
           <DictSelect
             v-model="queryParams.gender"
-            dictType="gender"
+            :dictType="DictTypeEnum.GENDER"
             :type="DictShowType.RADIO"
             style="width: 200px"
           />

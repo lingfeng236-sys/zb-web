@@ -17,7 +17,6 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  // 显示类型: 'select' | 'radio' | 'button'
   type: {
     type: String,
     default: DictShowType.SELECT,

@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 import DictSelect from '@/components/DictSelect/index.vue'
-import { DictShowType } from '@/enums/DictEnum'
+import { DictShowType, DictTypeEnum } from '@/enums/DictEnum'
 
 defineOptions({
   name: 'LoginIndex',
@@ -186,14 +186,18 @@ const handleRegister = () => {
         <el-form-item prop="gender">
           <DictSelect
             v-model="registerForm.gender"
-            dictType="gender"
+            :dictType="DictTypeEnum.GENDER"
             placeholder="请选择性别"
             :type="DictShowType.RADIO"
           />
         </el-form-item>
 
         <el-form-item prop="role" label="角色">
-          <DictSelect v-model="registerForm.role" dictType="role" placeholder="请选择角色" />
+          <DictSelect
+            v-model="registerForm.role"
+            :dictType="DictTypeEnum.ROLE"
+            placeholder="请选择角色"
+          />
         </el-form-item>
 
         <el-form-item>

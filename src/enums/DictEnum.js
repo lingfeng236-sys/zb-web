@@ -13,5 +13,6 @@ Object.freeze(DictShowType)
 export const DictTypeEnum = {
   ROLE: 'role',
   GENDER: 'gender',
+  PACKAGING_VERSION: 'packaging_version',
 }
 Object.freeze(DictTypeEnum)
