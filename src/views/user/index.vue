@@ -2,6 +2,7 @@
 // import { defineOptions, reactive } from 'vue'
 // 引入我们刚才封装的组件 (由于配置了自动引入组件，其实不需要手动 import，但为了明确演示我写在这里)
 // import DictSelect from '@/components/DictSelect/index.vue'
+import { DictShowType } from '@/enums/DictTypeEnum'
 
 defineOptions({
   name: 'DashboardIndex',
@@ -37,7 +38,7 @@ const handleVersionChange = (val) => {
           <DictSelect
             v-model="queryParams.gender"
             dict-code="gender"
-            type="radio"
+            :type="DictShowType.RADIO"
             style="width: 200px"
           />
         </el-form-item>

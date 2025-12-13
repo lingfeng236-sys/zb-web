@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 import DictSelect from '@/components/DictSelect/index.vue'
+import { DictShowType } from '@/enums/DictTypeEnum'
 
 defineOptions({
   name: 'LoginIndex',
@@ -34,7 +35,7 @@ const registerForm = reactive({
   username: '',
   password: '',
   confirmPassword: '',
-  gender: '1', // 默认性别：1男 2女
+  gender: 1, // 默认性别：1男 2女
   role: '', // 默认角色：1管理员 2普通用户
 })
 
@@ -187,7 +188,7 @@ const handleRegister = () => {
             v-model="registerForm.gender"
             dict-code="gender"
             placeholder="请选择性别"
-            type="radio"
+            :type="DictShowType.RADIO"
           />
         </el-form-item>
 

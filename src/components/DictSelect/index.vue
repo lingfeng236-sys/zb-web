@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useDictStore } from '@/stores/dict'
+import { DictShowType } from '@/enums/DictTypeEnum'
 
 defineOptions({
   name: 'DictSelect',
@@ -19,7 +20,7 @@ const props = defineProps({
   // 显示类型: 'select' | 'radio' | 'button'
   type: {
     type: String,
-    default: 'select',
+    default: DictShowType.SELECT,
   },
   placeholder: {
     type: String,
@@ -76,7 +77,7 @@ watch(
 
 <template>
   <div class="dict-select-container">
-    <el-radio-group v-if="type === 'button'" v-model="innerValue">
+    <el-radio-group v-if="type === DictShowType.BUTTON" v-model="innerValue">
       <el-radio-button
         v-for="item in options"
         :key="item[propMap.value]"
@@ -86,7 +87,11 @@ watch(
       </el-radio-button>
     </el-radio-group>
 
-    <el-radio-group v-else-if="type === 'radio'" v-model="innerValue" class="dict-radio-group">
+    <el-radio-group
+      v-else-if="type === DictShowType.RADIO"
+      v-model="innerValue"
+      class="dict-radio-group"
+    >
       <el-radio
         v-for="item in options"
         :key="item[propMap.value]"
