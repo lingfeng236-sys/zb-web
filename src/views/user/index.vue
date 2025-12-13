@@ -34,7 +34,12 @@ const handleVersionChange = (val) => {
         </el-form-item>
 
         <el-form-item label="用户性别">
-          <DictSelect v-model="queryParams.gender" dict-code="gender" style="width: 200px" />
+          <DictSelect
+            v-model="queryParams.gender"
+            dict-code="gender"
+            type="radio"
+            style="width: 200px"
+          />
         </el-form-item>
 
         <el-form-item>

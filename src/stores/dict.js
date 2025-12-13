@@ -39,19 +39,19 @@ export const useDictStore = defineStore('dict', () => {
 function mockBackendData(type) {
   if (type === 'packaging_version') {
     return [
-      { label: 'GEO', value: 1 },
-      { label: 'LUX', value: 2 },
-      { label: 'STDX', value: 3 },
-      { label: 'PMTA', value: 4 },
-      { label: 'NLD', value: 5 },
-      { label: 'FGH', value: 6 },
-      { label: 'PHL', value: 7 },
+      // 这里改为 code 和 desc
+      { desc: 'GEO', code: 1 },
+      { desc: 'LUX', code: 2 },
+      { desc: 'STDX', code: 3 },
+      { desc: 'PMTA', code: 4 },
+      // ...
     ]
   }
   if (type === 'gender') {
     return [
-      { label: '男', value: '1' },
-      { label: '女', value: '2' },
+      // 注意：截图里 getCode 返回 Integer，所以这里建议用数字
+      { desc: '男', code: 1 },
+      { desc: '女', code: 2 },
     ]
   }
   return []

@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useDictStore } from '@/stores/dict'
-import { Male, Female } from '@element-plus/icons-vue' // 引入图标（可选，如果需要特定图标）
 
 defineOptions({
   name: 'DictSelect',
@@ -9,12 +8,18 @@ defineOptions({
 
 const props = defineProps({
   modelValue: {
-    type: [String, Number, Array],
+    // 后端 code 是 Integer，前端可能是 Number 或 String，这里兼容一下
+    type: [String, Number, Array, Boolean],
     default: '',
   },
   dictCode: {
     type: String,
     required: true,
+  },
+  // 显示类型: 'select' | 'radio' | 'button'
+  type: {
+    type: String,
+    default: 'select',
   },
   placeholder: {
     type: String,
@@ -28,10 +33,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  // 新增：强制使用 Select 模式（即使只有2个选项也显示下拉框）
-  forceSelect: {
-    type: Boolean,
-    default: false,
+  // === 优化点：默认值改为后端统一的 code 和 desc ===
+  propMap: {
+    type: Object,
+    default: () => ({ label: 'desc', value: 'code' }),
   },
 })
 
@@ -40,7 +45,7 @@ const dictStore = useDictStore()
 const options = ref([])
 const loading = ref(false)
 
-// 双向绑定处理
+// 双向绑定代理
 const innerValue = computed({
   get: () => props.modelValue,
   set: (val) => {
@@ -49,19 +54,11 @@ const innerValue = computed({
   },
 })
 
-// 计算是否显示为 Radio 模式
-// 条件：非多选 + 选项数量小于等于2 + 未强制开启Select模式 + 数据加载完成
-const showAsRadio = computed(() => {
-  if (props.multiple) return false
-  if (props.forceSelect) return false
-  if (loading.value) return false // 加载中还是显示 Select 或 Loading 比较好
-  return options.value.length > 0 && options.value.length <= 2
-})
-
 // 初始化数据
 const initData = async () => {
   if (!props.dictCode) return
   loading.value = true
+  // Store 获取的数据结构应该是 [{ code: 1, desc: '男' }, ...]
   options.value = await dictStore.getDict(props.dictCode)
   loading.value = false
 }
@@ -72,21 +69,31 @@ onMounted(() => {
 
 watch(
   () => props.dictCode,
-  () => {
-    initData()
-  },
+  () => initData(),
 )
 </script>
+“
 
 <template>
   <div class="dict-select-container">
-    <el-radio-group v-if="showAsRadio" v-model="innerValue" class="dict-radio-group">
-      <el-radio v-for="item in options" :key="item.value" :value="item.value" border>
-        <div class="radio-content">
-          <el-icon v-if="item.label.includes('男')"><Male /></el-icon>
-          <el-icon v-if="item.label.includes('女')"><Female /></el-icon>
-          <span>{{ item.label }}</span>
-        </div>
+    <el-radio-group v-if="type === 'button'" v-model="innerValue">
+      <el-radio-button
+        v-for="item in options"
+        :key="item[propMap.value]"
+        :value="item[propMap.value]"
+      >
+        {{ item[propMap.label] }}
+      </el-radio-button>
+    </el-radio-group>
+
+    <el-radio-group v-else-if="type === 'radio'" v-model="innerValue" class="dict-radio-group">
+      <el-radio
+        v-for="item in options"
+        :key="item[propMap.value]"
+        :value="item[propMap.value]"
+        border
+      >
+        {{ item[propMap.label] }}
       </el-radio>
     </el-radio-group>
 
@@ -101,16 +108,21 @@ watch(
     >
       <el-option
         v-for="item in options"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"
-      />
+        :key="item[propMap.value]"
+        :label="item[propMap.label]"
+        :value="item[propMap.value]"
+      >
+        <template v-if="$slots.default">
+          <slot :item="item"></slot>
+        </template>
+      </el-option>
     </el-select>
   </div>
 </template>
 
 <style scoped>
 .dict-select-container {
+  display: inline-block;
   width: 100%;
 }
 

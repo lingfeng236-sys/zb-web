@@ -35,7 +35,7 @@ const registerForm = reactive({
   password: '',
   confirmPassword: '',
   gender: '1', // 默认性别：1男 2女
-  role: '1', // 默认角色：1管理员 2普通用户
+  role: '', // 默认角色：1管理员 2普通用户
 })
 
 // 自定义校验：检查两次密码是否一致
@@ -183,11 +183,15 @@ const handleRegister = () => {
         </el-form-item>
 
         <el-form-item prop="gender">
-          <DictSelect v-model="registerForm.gender" dict-code="gender" placeholder="请选择性别" />
+          <DictSelect
+            v-model="registerForm.gender"
+            dict-code="gender"
+            placeholder="请选择性别"
+            type="radio"
+          />
         </el-form-item>
 
-        <el-form-item prop="role">
-          角色
+        <el-form-item prop="role" label="角色">
           <DictSelect
             v-model="registerForm.role"
             dict-code="packaging_version"
