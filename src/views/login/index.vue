@@ -30,16 +30,10 @@ const handleLogin = () => {
   loginFormRef.value.validate(async (valid) => {
     if (valid) {
       loading.value = true
-      try {
-        await userStore.login(loginForm)
-        ElMessage.success('登录成功')
-        router.push('/') // 跳转到首页
-      } catch (error) {
-        console.error(error)
-        ElMessage.error('登录失败')
-      } finally {
-        loading.value = false
-      }
+      await userStore.login(loginForm)
+      ElMessage.success('登录成功')
+      router.push('/') // 跳转到首页
+      loading.value = false
     }
   })
 }

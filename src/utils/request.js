@@ -32,7 +32,7 @@ service.interceptors.response.use(
     // 假设后端约定：code === 200 代表成功
     // 注意：这里需要根据你实际后端的约定修改
     if (res.code !== 200) {
-      ElMessage.error(res.message || '系统错误')
+      ElMessage.error(res.msg || '系统错误')
 
       // 401 代表 Token 过期或未登录
       if (res.code === 401) {
