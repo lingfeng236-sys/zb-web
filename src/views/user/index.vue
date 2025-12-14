@@ -1,7 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { getUserPageApi, deleteUserApi, registerApi } from '@/api/user'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search, Refresh, Delete, Edit } from '@element-plus/icons-vue'
 
 defineOptions({ name: 'UserIndex' })

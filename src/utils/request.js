@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 
 // 创建 axios 实例
