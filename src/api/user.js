@@ -31,3 +31,11 @@ export function deleteUserApi(id) {
     method: 'delete',
   })
 }
+
+export function addOrEditUserApi(data) {
+  return request({
+    url: '/user/addOrEdit',
+    method: 'put',
+    data,
+  })
+}

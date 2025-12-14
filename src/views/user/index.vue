@@ -2,6 +2,8 @@
 import { ref, reactive, onMounted } from 'vue'
 import { getUserPageApi, deleteUserApi, registerApi } from '@/api/user'
 import { Plus, Search, Refresh, Delete, Edit } from '@element-plus/icons-vue'
+import { AddEditEnum } from '@/enums/Constant'
+import { DictShowType, DictTypeEnum } from '@/enums/DictEnum'
 
 defineOptions({ name: 'UserIndex' })
 
@@ -113,7 +115,7 @@ const submitForm = async () => {
   if (!formRef.value) return
   await formRef.value.validate(async (valid) => {
     if (valid) {
-      if (formType.value === 'add') {
+      if (formType.value === AddEditEnum.ADD) {
         // 调用之前的注册接口作为新增
         await registerApi(form)
         ElMessage.success('新增成功')
@@ -149,7 +151,7 @@ onMounted(() => {
         <el-form-item label="性别">
           <DictSelect
             v-model="queryParams.gender"
-            dictType="gender"
+            :dictType="DictTypeEnum.GENDER"
             placeholder="全部"
             style="width: 120px"
           />
@@ -158,7 +160,7 @@ onMounted(() => {
         <el-form-item label="角色">
           <DictSelect
             v-model="queryParams.role"
-            dictType="role"
+            :dictType="DictTypeEnum.ROLE"
             placeholder="全部"
             style="width: 120px"
           />
@@ -218,7 +220,7 @@ onMounted(() => {
       <el-pagination
         v-model:current-page="queryParams.pageNo"
         v-model:page-size="queryParams.pageSize"
-        :page-sizes="[10, 20, 50]"
+        :page-sizes="[2, 5, 10]"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total"
         @size-change="handleSizeChange"
@@ -250,7 +252,7 @@ onMounted(() => {
           <DictSelect v-model="form.gender" dictType="gender" type="radio" />
         </el-form-item>
         <el-form-item label="角色" prop="role" v-if="formType === 'edit'">
-          <DictSelect v-model="form.role" dictType="role" placeholder="请选择角色" />
+          <DictSelect v-model="form.role" :dictType="DictTypeEnum.ROLE" placeholder="请选择角色" />
         </el-form-item>
       </el-form>
       <template #footer>
