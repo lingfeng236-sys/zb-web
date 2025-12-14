@@ -97,8 +97,8 @@ const handleDelete = (row) => {
 }
 
 // 5. 打开新增弹窗
-const openAddDialog = () => {
-  formType.value = 'add'
+const openAddDialog = (type) => {
+  formType.value = type
   // 重置表单
   form.username = ''
   form.password = '' // 默认密码
@@ -172,7 +172,7 @@ onMounted(() => {
     </el-card>
 
     <div class="table-operations" style="margin: 15px 0">
-      <el-button type="primary" :icon="Plus" @click="openAddDialog">新增用户</el-button>
+      <el-button type="primary" :icon="Plus" @click="openAddDialog('add')">新增用户</el-button>
     </div>
 
     <el-table v-loading="loading" :data="tableData" border style="width: 100%">
@@ -204,7 +204,7 @@ onMounted(() => {
 
       <el-table-column label="操作" fixed="right" min-width="150">
         <template #default="scope">
-          <el-button link type="primary" :icon="Edit" @click="ElMessage.info('功能开发中...')">
+          <el-button link type="primary" :icon="Edit" @click="openAddDialog('edit')">
             编辑
           </el-button>
           <el-button link type="danger" :icon="Delete" @click="handleDelete(scope.row)">
@@ -249,7 +249,7 @@ onMounted(() => {
         <el-form-item label="性别" prop="gender">
           <DictSelect v-model="form.gender" dictType="gender" type="radio" />
         </el-form-item>
-        <el-form-item label="角色" prop="role">
+        <el-form-item label="角色" prop="role" v-if="formType === 'edit'">
           <DictSelect v-model="form.role" dictType="role" placeholder="请选择角色" />
         </el-form-item>
       </el-form>
