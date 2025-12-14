@@ -5,7 +5,7 @@ import { HomeFilled, User, ArrowDown, Expand, Fold } from '@element-plus/icons-v
 import { ref, computed } from 'vue'
 
 defineOptions({
-  name: 'LayoutIndex'
+  name: 'LayoutIndex',
 })
 
 const router = useRouter()
@@ -32,7 +32,12 @@ const toggleSidebar = () => {
   <el-container class="layout-container">
     <el-aside :width="isCollapse ? '64px' : '220px'" class="aside">
       <div class="logo">
-        <img v-if="!isCollapse" src="https://element-plus.org/images/element-plus-logo.svg" alt="logo" class="logo-img" />
+        <img
+          v-if="!isCollapse"
+          src="https://element-plus.org/images/element-plus-logo.svg"
+          alt="logo"
+          class="logo-img"
+        />
         <span v-else>E+</span>
       </div>
 
@@ -73,7 +78,10 @@ const toggleSidebar = () => {
         <div class="header-right">
           <el-dropdown @command="handleCommand">
             <span class="el-dropdown-link">
-              <el-avatar :size="30" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+              <el-avatar
+                :size="30"
+                src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+              />
               <span class="username">Admin</span>
               <el-icon class="el-icon--right"><arrow-down /></el-icon>
             </span>
