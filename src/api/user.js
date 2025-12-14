@@ -16,3 +16,18 @@ export function registerApi(data) {
     data,
   })
 }
+
+export function getUserPageApi(params) {
+  return request({
+    url: '/user/page',
+    method: 'get',
+    params, // get 请求的参数要放在 params 里
+  })
+}
+
+export function deleteUserApi(id) {
+  return request({
+    url: `/user/delete/${id}`,
+    method: 'delete',
+  })
+}
