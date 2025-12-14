@@ -39,3 +39,11 @@ export function addOrEditUserApi(data) {
     data,
   })
 }
+
+//  新增：获取用户详情
+export function getUserDetailApi(id) {
+  return request({
+    url: `/user/get/${id}`,
+    method: 'get',
+  })
+}

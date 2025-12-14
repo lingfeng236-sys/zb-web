@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { getUserPageApi, deleteUserApi, registerApi } from '@/api/user'
+import { getUserPageApi, deleteUserApi, addOrEditUserApi, getUserDetailApi } from '@/api/user'
 import { Plus, Search, Refresh, Delete, Edit } from '@element-plus/icons-vue'
 import { AddEditEnum } from '@/enums/Constant'
 import { DictShowType, DictTypeEnum } from '@/enums/DictEnum'
@@ -14,8 +14,8 @@ const total = ref(0)
 
 // 查询参数
 const queryParams = reactive({
-  pageNo: 1,
-  pageSize: 10,
+  pageNum: 1,
+  pageSize: 2,
   username: '',
   gender: '', // 这里绑定的将是 code (Integer)
   role: '', // 这里绑定的将是 code (Integer)
@@ -26,6 +26,7 @@ const dialogVisible = ref(false)
 const formRef = ref()
 const formType = ref('add') // 'add' or 'edit'
 const form = reactive({
+  id: undefined,
   username: '',
   password: '', // 只有新增时必填
   nickname: '',
@@ -33,11 +34,13 @@ const form = reactive({
   role: '',
 })
 
-const rules = {
+// ✅ 动态规则：密码仅在新增时必填
+const rules = reactive({
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  // password 的规则我们在打开弹窗时动态处理
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
   role: [{ required: true, message: '请选择角色', trigger: 'change' }],
-}
+})
 
 // === 方法定义 ===
 
@@ -45,14 +48,7 @@ const rules = {
 const getList = async () => {
   loading.value = true
   try {
-    const res = await getUserPageApi({
-      pageNo: queryParams.pageNo,
-      pageSize: queryParams.pageSize,
-      username: queryParams.username,
-      // 如果后端支持根据 code 查询，这里可以直接传
-      // genderCode: queryParams.gender,
-      // roleCode: queryParams.role
-    })
+    const res = await getUserPageApi(queryParams)
     // 后端返回的是 Result<Page<User>>，records 是数据列表
     tableData.value = res.records
     total.value = res.total
@@ -65,7 +61,7 @@ const getList = async () => {
 
 // 2. 搜索 & 重置
 const handleSearch = () => {
-  queryParams.pageNo = 1
+  queryParams.pageNum = 1
   getList()
 }
 const resetQuery = () => {
@@ -81,7 +77,7 @@ const handleSizeChange = (val) => {
   getList()
 }
 const handleCurrentChange = (val) => {
-  queryParams.pageNo = val
+  queryParams.pageNum = val
   getList()
 }
 
@@ -98,33 +94,75 @@ const handleDelete = (row) => {
   })
 }
 
-// 5. 打开新增弹窗
-const openAddDialog = (type) => {
+//  openAddDialog 方法
+const openAddDialog = async (type, row) => {
   formType.value = type
-  // 重置表单
-  form.username = ''
-  form.password = '' // 默认密码
-  form.nickname = ''
-  form.gender = 1 // 默认男
-  form.role = 2 // 默认普通用户
   dialogVisible.value = true
+
+  // 1. 先重置表单（清空上一轮的校验和数据）
+  // 必须在 nextTick 里，因为 dialogVisible=true 后 DOM 还没完全渲染，formRef 可能是空的
+  await nextTick()
+  if (formRef.value) {
+    formRef.value.resetFields()
+    rules.password[0].required = type === 'add'
+  }
+
+  // 2. 根据类型处理数据
+  if (type === 'edit' && row) {
+    // === 核心变化：调用后端接口获取最新数据 ===
+    try {
+      // 开启局部 loading (可选，提升体验)
+      loading.value = true
+
+      const res = await getUserDetailApi(row.id)
+      const data = res // 假设 request.js 响应拦截器直接返回了 data，如果是 res.data 请调整
+
+      // 3. 数据回显
+      // 注意：后端返回的可能是 Enum 对象 {code:1, desc:'男'}，表单需要提取 code
+      Object.assign(form, {
+        id: data.id,
+        username: data.username,
+        nickname: data.nickname,
+        gender: data.gender?.code, // 提取枚举值的 code
+        role: data.role?.code, // 提取枚举值的 code
+        password: '', // 密码依然留空，避免回显加密后的乱码
+      })
+    } catch (e) {
+      console.error('获取详情失败', e)
+      ElMessage.error('获取数据失败，请重试')
+      dialogVisible.value = false // 失败则关窗
+    } finally {
+      loading.value = false
+    }
+  } else {
+    // === 新增模式 ===
+    // 手动清空 id (resetFields 不负责这个)
+    form.id = undefined
+    form.username = ''
+    form.password = ''
+    form.nickname = ''
+    form.gender = 1
+    form.role = 2
+  }
 }
 
-// 6. 提交表单
+// 6. 提交表单 (修改为调用 addOrEdit)
 const submitForm = async () => {
   if (!formRef.value) return
   await formRef.value.validate(async (valid) => {
     if (valid) {
-      if (formType.value === AddEditEnum.ADD) {
-        // 调用之前的注册接口作为新增
-        await registerApi(form)
-        ElMessage.success('新增成功')
-      } else {
-        // 这里的 edit 接口还没写，你可以自己补充
-        ElMessage.warning('编辑功能暂未实现')
+      try {
+        // 统一调用 addOrEdit 接口
+        // 如果是编辑且密码为空，后端 UserSaveDto 接收到 password 为空字符串
+        // 你可能需要在后端 UserService 额外判断一下：如果 password 为空则不更新密码字段
+        await addOrEditUserApi(form)
+
+        ElMessage.success(formType.value === 'add' ? '新增成功' : '修改成功')
+        dialogVisible.value = false
+        getList()
+      } catch (error) {
+        console.error(error)
       }
-      dialogVisible.value = false
-      getList()
     }
   })
 }
@@ -206,7 +244,7 @@ onMounted(() => {
 
       <el-table-column label="操作" fixed="right" min-width="150">
         <template #default="scope">
-          <el-button link type="primary" :icon="Edit" @click="openAddDialog('edit')">
+          <el-button link type="primary" :icon="Edit" @click="openAddDialog('edit', scope.row)">
             编辑
           </el-button>
           <el-button link type="danger" :icon="Delete" @click="handleDelete(scope.row)">
@@ -218,7 +256,7 @@ onMounted(() => {
 
     <div style="margin-top: 20px; display: flex; justify-content: flex-end">
       <el-pagination
-        v-model:current-page="queryParams.pageNo"
+        v-model:current-page="queryParams.pageNum"
         v-model:page-size="queryParams.pageSize"
         :page-sizes="[2, 5, 10]"
         layout="total, sizes, prev, pager, next, jumper"
@@ -237,7 +275,7 @@ onMounted(() => {
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" placeholder="请输入用户名" />
         </el-form-item>
-        <el-form-item label="密码" prop="password" v-if="formType === 'add'">
+        <el-form-item label="密码" prop="password">
           <el-input
             v-model="form.password"
             type="password"
@@ -249,7 +287,11 @@ onMounted(() => {
           <el-input v-model="form.nickname" placeholder="请输入昵称" />
         </el-form-item>
         <el-form-item label="性别" prop="gender">
-          <DictSelect v-model="form.gender" dictType="gender" type="radio" />
+          <DictSelect
+            v-model="form.gender"
+            :dictType="DictTypeEnum.GENDER"
+            :type="DictShowType.RADIO"
+          />
         </el-form-item>
         <el-form-item label="角色" prop="role" v-if="formType === 'edit'">
           <DictSelect v-model="form.role" :dictType="DictTypeEnum.ROLE" placeholder="请选择角色" />
