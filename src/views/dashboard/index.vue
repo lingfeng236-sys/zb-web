@@ -1,6 +1,6 @@
 <script setup>
 defineOptions({
-  name: 'DashboardIndex'
+  name: 'DashboardIndex',
 })
 </script>
 
@@ -33,11 +33,9 @@ defineOptions({
       </el-col>
     </el-row>
 
-    <el-card shadow="never" style="margin-top: 20px; height: 400px;">
+    <el-card shadow="never" style="margin-top: 20px; height: 400px">
       <template #header>数据趋势图 (占位)</template>
-      <div style="text-align: center; color: #999; margin-top: 100px;">
-        ECharts 图表区域
-      </div>
+      <div style="text-align: center; color: #999; margin-top: 100px">ECharts 图表区域</div>
     </el-card>
   </div>
 </template>
@@ -46,6 +44,6 @@ defineOptions({
 .card-num {
   margin: 0;
   font-size: 24px;
-  color: #409EFF;
+  color: #409eff;
 }
 </style>

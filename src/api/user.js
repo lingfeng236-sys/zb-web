@@ -64,3 +64,12 @@ export function updateProfileApi(data) {
     data,
   })
 }
+
+// 修改密码
+export function updatePasswordApi(data) {
+  return request({
+    url: '/user/updatePassword',
+    method: 'put',
+    data,
+  })
+}

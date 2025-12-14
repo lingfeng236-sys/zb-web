@@ -1,6 +1,6 @@
 <script setup>
 import { useUserStore } from '@/stores/user'
-import { addOrEditUserApi } from '@/api/user' // 复用保存接口，或者用专门的 updateProfileApi
+import { updateProfileApi, updatePasswordApi } from '@/api/user'
 import DictSelect from '@/components/DictSelect/index.vue'
 import { DictTypeEnum } from '@/enums/DictEnum'
 import { User, Timer } from '@element-plus/icons-vue'
@@ -67,7 +67,7 @@ const submitInfo = async () => {
     if (valid) {
       // 复用后端的 addOrEdit 接口（注意：后端要支持只更新非空字段，或者这里传全）
       // 建议后端单独写一个 updateProfile 接口更安全
-      await addOrEditUserApi({
+      await updateProfileApi({
         ...infoForm,
         password: '', // 密码留空不修改
       })
@@ -78,22 +78,14 @@ const submitInfo = async () => {
   })
 }
 
-// 提交修改密码 (你需要确认后端有没有 updatePassword 接口)
-// 假设后端接口路径是 /user/updatePassword?username=xx&newPwd=xx&oldPwd=xx
-// 这里仅做演示
-import request from '@/utils/request'
+// 提交修改密码
 const submitPwd = async () => {
   await pwdFormRef.value.validate(async (valid) => {
     if (valid) {
-      // 假设的调用
-      await request({
-        url: '/user/updatePassword',
-        method: 'put',
-        params: {
-          username: infoForm.username,
-          newPwd: pwdForm.newPassword,
-          // 真实场景最好传 oldPwd 给后端校验
-        },
+      await updatePasswordApi({
+        username: infoForm.username, // 当前登录用户名
+        oldPassword: pwdForm.oldPassword,
+        newPassword: pwdForm.newPassword,
       })
       ElMessage.success('密码修改成功，请重新登录')
       userStore.logout()
