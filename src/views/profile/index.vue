@@ -1,10 +1,9 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
-import { ElMessage } from 'element-plus'
 import { addOrEditUserApi } from '@/api/user' // 复用保存接口，或者用专门的 updateProfileApi
 import DictSelect from '@/components/DictSelect/index.vue'
 import { DictTypeEnum } from '@/enums/DictEnum'
+import { User, Timer } from '@element-plus/icons-vue'
 
 defineOptions({
   name: 'ProfileIndex',
@@ -12,8 +11,6 @@ defineOptions({
 
 const userStore = useUserStore()
 const activeTab = ref('info')
-
-defineOptions
 
 // === 基本资料表单 ===
 const infoFormRef = ref()
