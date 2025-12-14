@@ -1,15 +1,16 @@
 <script setup>
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { HomeFilled, User, ArrowDown, Expand, Fold } from '@element-plus/icons-vue'
+import { HomeFilled, User, ArrowDown, Expand, Fold, SwitchButton } from '@element-plus/icons-vue'
 import { ref, computed } from 'vue'
 
 defineOptions({
   name: 'LayoutIndex',
 })
 
-const router = useRouter()
 const route = useRoute()
+const router = useRouter()
+
 const userStore = useUserStore()
 
 const isCollapse = ref(false)
@@ -18,8 +19,11 @@ const isCollapse = ref(false)
 const activeMenu = computed(() => route.path)
 
 const handleCommand = (command) => {
-  if (command === 'logout') {
+  if (command === 'profile') {
+    router.push('/profile') // 跳转到个人中心
+  } else if (command === 'logout') {
     userStore.logout()
+    router.push('/login')
   }
 }
 
@@ -82,13 +86,15 @@ const toggleSidebar = () => {
                 :size="30"
                 src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
               />
-              <span class="username">Admin</span>
+              <span class="username">{{ userStore.userInfo.username }}</span>
               <el-icon class="el-icon--right"><arrow-down /></el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item>个人中心</el-dropdown-item>
-                <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item command="profile" :icon="User">个人中心</el-dropdown-item>
+                <el-dropdown-item divided command="logout" :icon="SwitchButton"
+                  >退出登录</el-dropdown-item
+                >
               </el-dropdown-menu>
             </template>
           </el-dropdown>

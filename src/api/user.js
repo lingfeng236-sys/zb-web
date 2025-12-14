@@ -47,3 +47,20 @@ export function getUserDetailApi(id) {
     method: 'get',
   })
 }
+
+// 新增：获取当前用户信息
+export function getUserInfoApi() {
+  return request({
+    url: '/user/info',
+    method: 'get',
+  })
+}
+
+// 新增：更新个人资料
+export function updateProfileApi(data) {
+  return request({
+    url: '/user/updateProfile', // 记得后端 Controller 也要加这个接口哦，或者复用 addOrEdit 但要做限制
+    method: 'put',
+    data,
+  })
+}

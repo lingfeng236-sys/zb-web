@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { loginApi, registerApi } from '@/api/user'
+import { loginApi, registerApi, getUserInfoApi } from '@/api/user'
 import { useRouter } from 'vue-router'
 
 export const useUserStore = defineStore(
@@ -8,23 +8,17 @@ export const useUserStore = defineStore(
   () => {
     const token = ref('')
     const router = useRouter()
-
+    // 用户信息对象
+    const userInfo = ref({})
     const login = async (loginForm) => {
-      try {
-        const res = await loginApi(loginForm)
-        token.value = res
-        return true
-      } catch (error) {
-        return Promise.reject(error)
-      }
+      const res = await loginApi(loginForm)
+      token.value = res
+      // 登录成功后，立即获取用户信息
+      await getUserInfo()
     }
     // === 新增：注册 Action ===
     const register = async (registerForm) => {
-      try {
-        await registerApi(registerForm)
-      } catch (error) {
-        return Promise.reject(error)
-      }
+      await registerApi(registerForm)
     }
 
     const logout = () => {
@@ -32,13 +26,18 @@ export const useUserStore = defineStore(
       router.push('/login')
     }
 
-    return { token, login, logout, register }
+    const getUserInfo = async () => {
+      const res = await getUserInfoApi()
+      userInfo.value = res
+    }
+
+    return { token, login, logout, register, userInfo, getUserInfo }
   },
   {
     persist: {
       key: 'user-store',
       storage: localStorage,
-      paths: ['token'], // 只持久化 token 字段
+      paths: ['token'], // 只持久化 token 和 userInfo 字段
     },
   },
 )
