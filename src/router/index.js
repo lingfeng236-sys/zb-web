@@ -26,6 +26,12 @@ const router = createRouter({
           component: () => import('@/views/user/index.vue'),
           meta: { title: '用户管理' },
         },
+        {
+          path: 'profile',
+          component: () => import('@/views/profile/index.vue'),
+          name: 'Profile',
+          meta: { title: '个人中心' },
+        },
       ],
     },
   ],
