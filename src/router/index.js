@@ -32,6 +32,35 @@ const router = createRouter({
           name: 'Profile',
           meta: { title: '个人中心' },
         },
+        {
+          path: 'workflow',
+          component: () => import('@/views/workflow/todo.vue'),
+          redirect: '/workflow/todo',
+          name: 'Workflow',
+          meta: { title: '工作流', icon: 'el-icon-s-operation' }, // 记得换个图标
+          children: [
+            {
+              path: 'start',
+              component: () => import('@/views/workflow/start.vue'),
+              name: 'StartProcess',
+              meta: { title: '发起流程' },
+            },
+            {
+              path: 'todo',
+              component: () => import('@/views/workflow/todo.vue'),
+              name: 'MyTodo',
+              meta: { title: '我的待办' },
+            },
+            // 隐藏路由：任务办理详情页
+            {
+              path: 'audit/:taskId',
+              component: () => import('@/views/workflow/audit.vue'),
+              name: 'TaskAudit',
+              meta: { title: '任务办理', activeMenu: '/workflow/todo' },
+              hidden: true,
+            },
+          ],
+        },
       ],
     },
   ],
