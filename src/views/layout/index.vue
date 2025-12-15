@@ -1,8 +1,15 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { HomeFilled, User, ArrowDown, Expand, Fold, SwitchButton } from '@element-plus/icons-vue'
-import { ref, computed } from 'vue'
+import {
+  HomeFilled,
+  User,
+  ArrowDown,
+  Expand,
+  Fold,
+  SwitchButton,
+  Operation,
+} from '@element-plus/icons-vue'
 
 defineOptions({
   name: 'LayoutIndex',
@@ -17,6 +24,24 @@ const isCollapse = ref(false)
 
 // 获取当前激活的菜单项 (根据当前路由路径)
 const activeMenu = computed(() => route.path)
+
+// 动态获取菜单路由
+const menuRoutes = computed(() => {
+  const layoutRoute = router.options.routes.find((r) => r.path === '/')
+  if (!layoutRoute || !layoutRoute.children) return []
+
+  // 过滤掉隐藏的路由和个人中心
+  return layoutRoute.children.filter(
+    (item) => !item.hidden && item.meta?.title && item.path !== 'profile',
+  )
+})
+
+// 图标映射
+const iconMap = {
+  dashboard: HomeFilled,
+  user: User,
+  workflow: Operation,
+}
 
 const handleCommand = (command) => {
   if (command === 'profile') {
@@ -55,15 +80,36 @@ const toggleSidebar = () => {
         router
         :collapse-transition="false"
       >
-        <el-menu-item index="/dashboard">
-          <el-icon><HomeFilled /></el-icon>
-          <template #title>首页 Dashboard</template>
-        </el-menu-item>
+        <!-- 动态渲染菜单 -->
+        <template v-for="item in menuRoutes" :key="item.path">
+          <!-- 无子菜单 -->
+          <el-menu-item
+            v-if="!item.children || item.children.length === 0"
+            :index="'/' + item.path"
+          >
+            <el-icon>
+              <component :is="iconMap[item.path] || HomeFilled" />
+            </el-icon>
+            <template #title>{{ item.meta.title }}</template>
+          </el-menu-item>
 
-        <el-menu-item index="/user">
-          <el-icon><User /></el-icon>
-          <template #title>用户管理</template>
-        </el-menu-item>
+          <!-- 有子菜单 -->
+          <el-sub-menu v-else :index="'/' + item.path">
+            <template #title>
+              <el-icon>
+                <component :is="iconMap[item.path] || HomeFilled" />
+              </el-icon>
+              <span>{{ item.meta.title }}</span>
+            </template>
+            <el-menu-item
+              v-for="child in item.children.filter((c) => !c.hidden)"
+              :key="child.path"
+              :index="'/' + item.path + '/' + child.path"
+            >
+              {{ child.meta.title }}
+            </el-menu-item>
+          </el-sub-menu>
+        </template>
       </el-menu>
     </el-aside>
 

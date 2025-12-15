@@ -31,8 +31,6 @@ const fetchData = async () => {
 }
 
 const handleAudit = (row) => {
-  console.log(row)
-
   // 跳转到办理页面，带上taskId
   router.push(`/workflow/audit/${row.taskId}`)
 }

@@ -21,12 +21,9 @@ const initData = async () => {
   loading.value = true
   try {
     const res = await getTaskDetail(taskId)
-    if (res.code === 200) {
-      taskInfo.value = res.data.taskInfo
-      businessData.value = res.data.businessData || {}
-    } else {
-      ElMessage.error(res.msg)
-    }
+
+    taskInfo.value = res.taskInfo
+    businessData.value = res.businessData || {}
   } catch (error) {
     console.error(error)
   } finally {
@@ -78,16 +75,14 @@ onMounted(() => {
         <span>业务详情 - {{ taskInfo?.processName || '加载中...' }}</span>
       </template>
 
-      <div v-if="taskInfo?.processDefinitionKey === 'process_leave'">
+      <div v-if="taskInfo?.processCode === 'process_leave'">
         <el-descriptions :column="2" border>
           <el-descriptions-item label="申请人">{{ businessData.applicant }}</el-descriptions-item>
           <el-descriptions-item label="请假天数">{{ businessData.days }} 天</el-descriptions-item>
           <el-descriptions-item label="当前状态">
-            <el-tag>{{ businessData.status }}</el-tag>
+            <el-tag>{{ businessData.status?.desc }}</el-tag>
           </el-descriptions-item>
-          <el-descriptions-item label="申请时间">{{
-            businessData.createTime
-          }}</el-descriptions-item>
+          <el-descriptions-item label="申请时间">{{ taskInfo.createTime }}</el-descriptions-item>
         </el-descriptions>
       </div>
 

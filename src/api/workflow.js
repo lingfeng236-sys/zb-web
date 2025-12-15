@@ -14,7 +14,7 @@ export function getMyTodoTasks(params) {
 // 后端路径: GET /workflow/task/detail/{taskId}
 export function getTaskDetail(taskId) {
   return request({
-    url: `/workflow/task/detail/${taskId}`,
+    url: `/leave/task/detail/${taskId}`,
     method: 'get',
   })
 }

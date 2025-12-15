@@ -34,10 +34,9 @@ const router = createRouter({
         },
         {
           path: 'workflow',
-          component: () => import('@/views/workflow/todo.vue'),
           redirect: '/workflow/todo',
           name: 'Workflow',
-          meta: { title: '工作流', icon: 'el-icon-s-operation' }, // 记得换个图标
+          meta: { title: '工作流', icon: 'el-icon-s-operation' },
           children: [
             {
               path: 'start',
