@@ -1,8 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getTaskDetail, completeTask, getProcessDiagram } from '@/api/workflow'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import ProcessViewer from '@/components/ProcessViewer/index.vue' // 引入组件
 
 defineOptions({
@@ -30,11 +28,8 @@ const initData = async () => {
   loading.value = true
   try {
     const res = await getTaskDetail(taskId)
-
     taskInfo.value = res.taskInfo
     businessData.value = res.businessData || {}
-  } catch (error) {
-    console.error(error)
   } finally {
     loading.value = false
   }
@@ -44,15 +39,9 @@ const initData = async () => {
 const loadDiagram = async () => {
   if (!taskInfo.value?.processInstanceId) return
 
-  try {
-    const res = await getProcessDiagram(taskInfo.value.processInstanceId)
-    if (res.code === 200) {
-      diagramData.value = res.data
-      showDiagram.value = true
-    }
-  } catch (error) {
-    console.error(error)
-  }
+  const res = await getProcessDiagram(taskInfo.value.processInstanceId)
+  diagramData.value = res
+  showDiagram.value = true
 }
 
 // 提交审批
@@ -71,14 +60,9 @@ const submitAudit = (approved) => {
         approved: approved,
         comment: comment.value,
       }
-
-      const res = await completeTask(taskId, variables)
-      if (res.code === 200) {
-        ElMessage.success('审批成功')
-        router.push('/workflow/todo') // 返回待办列表
-      } else {
-        ElMessage.error(res.msg)
-      }
+      await completeTask(taskId, variables)
+      ElMessage.success('审批成功')
+      router.push('/workflow/todo') // 返回待办列表
     } finally {
       loading.value = false
     }
@@ -100,7 +84,9 @@ onMounted(async () => {
       <template #header>
         <div class="card-header">
           <span>流程进度追踪</span>
-          <el-tag type="warning" v-if="taskInfo.taskName">当前节点：{{ taskInfo.taskName }}</el-tag>
+          <el-tag type="warning" v-if="taskInfo?.taskName"
+            >当前节点：{{ taskInfo.taskName }}</el-tag
+          >
         </div>
       </template>
       <ProcessViewer
