@@ -52,3 +52,11 @@ export function startLeaveProcess(data) {
     },
   })
 }
+
+// 6. 获取流程图数据
+export function getProcessDiagram(processInstanceId) {
+  return request({
+    url: `/workflow/process/diagram/${processInstanceId}`,
+    method: 'get',
+  })
+}

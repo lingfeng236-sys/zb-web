@@ -1,8 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getTaskDetail, completeTask } from '@/api/workflow'
+import { getTaskDetail, completeTask, getProcessDiagram } from '@/api/workflow'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import ProcessViewer from '@/components/ProcessViewer/index.vue' // 引入组件
 
 defineOptions({
   name: 'AuditIndex',
@@ -16,6 +17,14 @@ const taskInfo = ref(null)
 const businessData = ref({})
 const comment = ref('')
 
+// 流程图数据
+const diagramData = ref({
+  xml: '',
+  activeActivityIds: [],
+  finishedActivityIds: [],
+})
+const showDiagram = ref(false) // 控制是否显示流程图
+
 // 获取详情数据
 const initData = async () => {
   loading.value = true
@@ -28,6 +37,21 @@ const initData = async () => {
     console.error(error)
   } finally {
     loading.value = false
+  }
+}
+
+// 加载流程图数据
+const loadDiagram = async () => {
+  if (!taskInfo.value?.processInstanceId) return
+
+  try {
+    const res = await getProcessDiagram(taskInfo.value.processInstanceId)
+    if (res.code === 200) {
+      diagramData.value = res.data
+      showDiagram.value = true
+    }
+  } catch (error) {
+    console.error(error)
   }
 }
 
@@ -61,15 +85,32 @@ const submitAudit = (approved) => {
   })
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (taskId) {
-    initData()
+    await initData()
+    // 拿到任务详情后，再去加载流程图
+    loadDiagram()
   }
 })
 </script>
 
 <template>
   <div class="app-container" v-loading="loading">
+    <el-card class="box-card" style="margin-bottom: 20px">
+      <template #header>
+        <div class="card-header">
+          <span>流程进度追踪</span>
+          <el-tag type="warning" v-if="taskInfo.taskName">当前节点：{{ taskInfo.taskName }}</el-tag>
+        </div>
+      </template>
+      <ProcessViewer
+        v-if="showDiagram"
+        :xml="diagramData.xml"
+        :active-activity-ids="diagramData.activeActivityIds"
+        :finished-activity-ids="diagramData.finishedActivityIds"
+      />
+    </el-card>
+
     <el-card class="box-card" style="margin-bottom: 20px">
       <template #header>
         <span>业务详情 - {{ taskInfo?.processName || '加载中...' }}</span>
