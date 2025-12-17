@@ -7,4 +7,5 @@ export function getDictDataApi(dictType) {
     method: 'get',
     params: { dictType },
   })
+
 }
